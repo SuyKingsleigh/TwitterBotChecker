@@ -56,7 +56,9 @@ def handle_mentions(since_id=None):
                     print("\t\t handling tweet  {'id': '" + str(m.id) + "' 'text': '" + m.text + "'}")
                     response = TweetHandler(str(m.id), m.text).handle()
                     if response:
-                        post_tweet(response, str(m.id))
+                        for msg in response:
+                            post_tweet(msg, str(m.id))
+
         else:
             print('\tNo new mention found')
 
