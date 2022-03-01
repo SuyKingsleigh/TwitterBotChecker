@@ -3,6 +3,7 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 
+from src.db.Mention import Mention
 from src.db.Tweet import Tweet
 
 load_dotenv()
@@ -75,9 +76,21 @@ class TweetDao:
             return tweets
 
 
+class MentionDao:
+    @staticmethod
+    def insert(mention):
+        insert = """INSERT INTO Mention (mention_id, since_id) VALUES (%s, %s)"""
+        with DBDriver(commit=True) as driver:
+            driver.cursor.execute(insert, (mention.mention_id, mention.since_id))
+
+
 if __name__ == '__main__':
+    print("sup world")
     # tweet = Tweet(tweet_id='123abc', text='texto de teste yay', link='www.google.com')
     # TweetDao.insert(tweet)
     # print(TweetDao.find_by_id('123abc'))
     # for link in TweetDao.find_by_link("www.google.com"):
     #     print(link)
+
+    mention = Mention("1234", "4321", None)
+    MentionDao.insert(mention)

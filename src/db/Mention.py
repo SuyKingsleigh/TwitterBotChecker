@@ -2,8 +2,7 @@ class Mention:
     # mention_id
     # since_id
     # checked_at
-
-    @staticmethod
-    def get_last_mention():
-        # Buscara no db o since_id cujo o id checked_at for maior
-        pass
+    def __init__(self, mention_id, since_id, checked_at):
+        self.mention_id = mention_id
+        self.since_id = since_id
+        self.checked_at = checked_at

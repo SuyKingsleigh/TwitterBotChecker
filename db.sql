@@ -15,21 +15,18 @@ create table Tweet
 create unique index Tweet_tweet_id_uindex
     on Tweet (tweet_id);
 
-
-
 create table Mention
 (
-    mention_id varchar(100)                       not null,
-    since_id   varchar(100)                       null,
-    checked_at datetime default CURRENT_TIMESTAMP null,
+    id         int auto_increment,
+    mention_id varchar(100) null,
+    since_id   varchar(100) null,
+    checked_at datetime     null,
     constraint Mention_pk
-        primary key (mention_id)
+        primary key (id)
 );
 
-create unique index Mention_mention_id_uindex
-    on Mention (mention_id);
-
-
+create unique index Mention_id_uindex
+    on Mention (id);
 
 create table Response
 (
@@ -46,11 +43,6 @@ create table TweetResponse
     response_id       int          null,
     constraint TweetResponse_pk
         primary key (tweet_response_id),
-    foreign key (tweet_id) references Tweet(tweet_id),
-    foreign key (response_id) references Response(response_id)
+    foreign key (tweet_id) references Tweet (tweet_id),
+    foreign key (response_id) references Response (response_id)
 );
-
-
-
-
-
