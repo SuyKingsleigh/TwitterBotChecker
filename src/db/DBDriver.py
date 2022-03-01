@@ -57,8 +57,27 @@ class TweetDao:
             for (tweet_id, text, link) in driver.cursor:
                 return Tweet(tweet_id, text, link)
 
+    @staticmethod
+    def find_by_link(link):
+        return TweetDao._find_by_link((link,))
+
+    @staticmethod
+    def _find_by_link(link):
+        select = """SELECT * from Tweet where link = %s"""
+
+        with DBDriver() as driver:
+            driver.cursor.execute(select, link)
+
+            tweets = []
+            for (tweet_id, text, link) in driver.cursor:
+                tweets.append(Tweet(tweet_id, text, link))
+
+            return tweets
+
 
 if __name__ == '__main__':
     # tweet = Tweet(tweet_id='123abc', text='texto de teste yay', link='www.google.com')
     # TweetDao.insert(tweet)
-    print(TweetDao.find_by_id('123abc'))
+    # print(TweetDao.find_by_id('123abc'))
+    # for link in TweetDao.find_by_link("www.google.com"):
+    #     print(link)
