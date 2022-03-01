@@ -9,6 +9,9 @@ class TweetHandler:
         self._id = id
         self._text = text
 
+    def has_links(self):
+        return len(self.find_links()) > 0
+
     # Retornara um array contendo todos os links de um tweet
     def find_links(self):
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"

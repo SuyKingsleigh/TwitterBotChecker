@@ -54,13 +54,24 @@ def handle_mentions(since_id=None):
                 print('\tFound ' + str(len(mentions[0])) + " new mentions!")
                 for m in mentions[0]:
                     print("\t\t handling tweet  {'id': '" + str(m.id) + "' 'text': '" + m.text + "'}")
-                    response = TweetHandler(str(m.id), m.text).handle()
-                    if response:
-                        for msg in response:
-                            post_tweet(msg, str(m.id))
 
-        else:
-            print('\tNo new mention found')
+                    handler = TweetHandler(str(m.id), m.text)
+                    if not handler.has_links():
+                        print("Could not find links, checking thread ...")
+                        thread = client.get_tweet(id=str(m.id), user_auth=True, expansions=['referenced_tweets.id'])
+                        original_tweet = thread.includes['tweets'][0]['data']
+
+                        handler = TweetHandler(str(original_tweet['id']), original_tweet['text'])
+
+                    try:
+                        response = handler.handle()
+                        if response:
+                            for msg in response:
+                                print('replying to: ' + str(m.id) + " with: " + msg)
+                                post_tweet(msg, str(m.id))
+
+                    except Exception:
+                        print(traceback.format_exc())
 
         print("Sleeping for 5secs ...")
 
@@ -80,3 +91,8 @@ if __name__ == '__main__':
           )
 
     handle_mentions()
+    # r = client.get_tweet(id='1498503958100426752', user_auth=True, expansions=['referenced_tweets.id'])
+    # if r.includes:
+    #     original_tweet = r.includes['tweets'][0]['data']
+    #     print(original_tweet['id'])
+    #     print(original_tweet['text'])
