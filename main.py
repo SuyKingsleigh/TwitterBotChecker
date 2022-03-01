@@ -5,6 +5,8 @@ import tweepy
 import os
 from dotenv import load_dotenv
 
+from src.TweetHandler import TweetHandler
+
 load_dotenv()
 
 CONSUMER_KEY = os.getenv('CONSUMER_KEY')
@@ -12,6 +14,7 @@ CONSUMER_SECRET = os.getenv('CONSUMER_SECRET')
 ACCESS_TOKEN = os.getenv('ACCESS_TOKEN')
 ACCESS_TOKENS_SECRET = os.getenv('ACCESS_TOKENS_SECRET')
 MY_USER_ID = os.getenv('MY_USER_ID')
+FACT_CHECK_URL = os.getenv("FACT_CHECK_URL")
 
 client = tweepy.Client(
     consumer_key=CONSUMER_KEY,
@@ -51,6 +54,9 @@ def handle_mentions(since_id=None):
                 print('\tFound ' + str(len(mentions[0])) + " new mentions!")
                 for m in mentions[0]:
                     print("\t\t handling tweet  {'id': '" + str(m.id) + "' 'text': '" + m.text + "'}")
+                    response = TweetHandler(str(m.id), m.text).handle()
+                    if response:
+                        post_tweet(response, str(m.id))
         else:
             print('\tNo new mention found')
 

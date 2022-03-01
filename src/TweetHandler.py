@@ -25,11 +25,12 @@ class TweetHandler:
                     meta_data_link[link] = MetaDataAnalyzer(link).get_meta_from_link()
                 except:
                     print('could not find metadata from ' + link)
+                    meta_data_link[link] = None
 
-            print(meta_data_link)
             return meta_data_link
 
+    def handle(self):
+        return 'nice'
 
 if __name__ == '__main__':
-    print(
-        TweetHandler('123', 'uga buga https://localhost banana http://www.sourcebits.com/').get_meta_data_from_links())
+    TweetHandler('123', 'uga buga https://localhost banana http://www.sourcebits.com/').handle()
