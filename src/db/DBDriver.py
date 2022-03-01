@@ -1,9 +1,13 @@
 # Classe para se comunicar com o db
+import time
+from sqlite3 import Date
+
 import mysql.connector
 import os
 from dotenv import load_dotenv
 
 from src.db.Mention import Mention
+from src.db.Response import Response
 from src.db.Tweet import Tweet
 
 load_dotenv()
@@ -38,7 +42,7 @@ class DBDriver:
 
 class TweetDao:
     @staticmethod
-    def insert(tweet):
+    def insert(tweet: Tweet):
         insert = """INSERT INTO Tweet (tweet_id, text, link) values (%s, %s, %s)"""
 
         with DBDriver(commit=True) as driver:
@@ -46,28 +50,20 @@ class TweetDao:
 
     @staticmethod
     def find_by_id(tweet_id):
-        return TweetDao._find_by_id((tweet_id,))
-
-    @staticmethod
-    def _find_by_id(tweet_id):
         select = """SELECT * from Tweet where tweet_id = %s"""
 
         with DBDriver() as driver:
-            driver.cursor.execute(select, tweet_id)
+            driver.cursor.execute(select, (tweet_id,))
 
             for (tweet_id, text, link) in driver.cursor:
                 return Tweet(tweet_id, text, link)
 
     @staticmethod
     def find_by_link(link):
-        return TweetDao._find_by_link((link,))
-
-    @staticmethod
-    def _find_by_link(link):
         select = """SELECT * from Tweet where link = %s"""
 
         with DBDriver() as driver:
-            driver.cursor.execute(select, link)
+            driver.cursor.execute(select, (link,))
 
             tweets = []
             for (tweet_id, text, link) in driver.cursor:
@@ -78,10 +74,54 @@ class TweetDao:
 
 class MentionDao:
     @staticmethod
-    def insert(mention):
+    def insert(mention: Mention):
         insert = """INSERT INTO Mention (mention_id, since_id) VALUES (%s, %s)"""
         with DBDriver(commit=True) as driver:
             driver.cursor.execute(insert, (mention.mention_id, mention.since_id))
+
+    @staticmethod
+    def get_last_mention():
+        query = """SELECT * from Mention ORDER BY id DESC LIMIT 1 """
+        with DBDriver() as driver:
+            driver.cursor.execute(query, )
+            mention = None
+            for (id, mention_id, since_id, checked_at) in driver.cursor:
+                mention = Mention(id=id, mention_id=mention_id, since_id=since_id, checked_at=checked_at)
+
+            return mention
+
+
+class ResponseDao:
+    @staticmethod
+    def insert(response: Response):
+        insert = """INSERT INTO Response (text) VALUES (%s)"""
+
+        with DBDriver(commit=True) as driver:
+            driver.cursor.execute(insert, (response.text,))
+
+    @staticmethod
+    def find_by_link(link):
+        query = """SELECT * From Response r
+                        JOIN TweetResponse TR on r.response_id = TR.response_id
+                        JOIN Tweet T on TR.tweet_id = T.tweet_id
+                            WHERE T.link = %s
+                        """
+
+        with DBDriver() as driver:
+            driver.cursor.execute(query, (link,))
+            response = None
+            for (response_id, text) in driver.cursor:
+                response = Response(response_id=response_id, text=text)
+
+            return response
+
+
+class TweetResponseDao:
+    @staticmethod
+    def insert(tweet_id: str, response_id: int):
+        insert = """INSERT INTO TweetResponse (tweet_id, response_id) VALUES (%s, %s)"""
+        with DBDriver(commit=True) as driver:
+            driver.cursor.execute(insert, (tweet_id, response_id))
 
 
 if __name__ == '__main__':
@@ -92,5 +132,9 @@ if __name__ == '__main__':
     # for link in TweetDao.find_by_link("www.google.com"):
     #     print(link)
 
-    mention = Mention("1234", "4321", None)
-    MentionDao.insert(mention)
+    # mention = Mention("1234", "4321", None)
+    # MentionDao.insert(mention)
+    # print(MentionDao.get_last_mention().checked_at)
+    #
+    # ResponseDao.insert(Response(text="uma string sei lá " + str(time.time())))
+    TweetResponseDao.insert("123abc", 1)

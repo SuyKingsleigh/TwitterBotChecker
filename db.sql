@@ -18,9 +18,9 @@ create unique index Tweet_tweet_id_uindex
 create table Mention
 (
     id         int auto_increment,
-    mention_id varchar(100) null,
-    since_id   varchar(100) null,
-    checked_at datetime     null,
+    mention_id varchar(100)                        not null,
+    since_id   varchar(100)                        null,
+    checked_at timestamp default current_timestamp null,
     constraint Mention_pk
         primary key (id)
 );
