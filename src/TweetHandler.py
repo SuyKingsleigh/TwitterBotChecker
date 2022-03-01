@@ -1,5 +1,6 @@
 import re
 
+from src.FactCheckerClient import FactCheckerClient
 from src.MetaDataAnalyzer import MetaDataAnalyzer
 
 
@@ -30,7 +31,28 @@ class TweetHandler:
             return meta_data_link
 
     def handle(self):
-        return 'nice'
+        claims = self.get_meta_data_from_links()
+        for link in claims.keys():
+            if link is None:
+                print("invalid link")
+                continue
+
+            print('verifying url: ' + link + ' keywords: ' + str(claims[link]))
+            fact_checker_client = None
+
+            if claims[link]:
+                if claims[link]['content']:
+                    fact_checker_client = FactCheckerClient(claims[link]['content'])
+                elif claims[link]['title']:
+                    fact_checker_client = FactCheckerClient(claims[link]['title'])
+                else:
+                    print('could not retrieve any useful info')
+                    return None
+            else:
+                fact_checker_client = FactCheckerClient([link])
+
+            return fact_checker_client.check()
+
 
 if __name__ == '__main__':
-    TweetHandler('123', 'uga buga https://localhost banana http://www.sourcebits.com/').handle()
+    print(TweetHandler('123', 'uga buga  banana https://www.ndtv.com/world-news/ghost-of-kyiv-real-or-urban-legend-some-facts-about-ukraines-ace-2795817').handle())

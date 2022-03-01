@@ -1,15 +1,14 @@
+import os
+
 import requests
 import json
-from main import FACT_CHECK_URL
 
-url = "http://localhost:42042/checkPretty?ghost%kiev"
+import os
+from dotenv import load_dotenv
 
-payload = {}
-headers = {}
+load_dotenv()
 
-response = requests.request("GET", url, headers=headers, data=payload)
-
-print(response.text)
+FACT_CHECK_URL = os.getenv("FACT_CHECK_URL")
 
 
 class FactCheckerClient:
@@ -26,8 +25,17 @@ class FactCheckerClient:
             return FACT_CHECK_URL + "check?" + self._build_query()
 
     def check(self):
-        response = requests.request("GET", self._build_url(pretty=True), headers={}, data={})
-        return response.text
+        url = self._build_url(pretty=True)
+        print("calling url `" + url + "`")
+        response = requests.request("GET", url, headers={}, data={})
+        if response.status_code == 200:
+            return json.loads(response.text)
+        else:
+            return {
+                "data": [""],
+                "errorCode": response.status_code,
+                "error": response.text
+            }
 
 
 if __name__ == '__main__':
