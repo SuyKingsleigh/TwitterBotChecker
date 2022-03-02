@@ -1,4 +1,5 @@
 import os
+import re
 
 import requests
 import json
@@ -13,7 +14,11 @@ FACT_CHECK_URL = os.getenv("FACT_CHECK_URL")
 
 class FactCheckerClient:
     def __init__(self, key_words):
-        self._key_words = key_words
+        self._key_words = []
+        for key_word in key_words:
+            key_word = re.sub(' ', '%', key_word)
+            k = re.sub('[^A-Za-z0-9]+', '%', key_word)
+            self._key_words.append(k)
 
     def _build_query(self):
         return "%".join(self._key_words)

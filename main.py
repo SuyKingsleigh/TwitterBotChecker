@@ -6,6 +6,9 @@ import os
 from dotenv import load_dotenv
 
 from src.TweetHandler import TweetHandler
+from src.db.DBDriver import MentionDao, TweetDao, ResponseDao, TweetResponseDao
+from src.db.Response import Response
+from src.db.Tweet import Tweet
 
 load_dotenv()
 
@@ -36,6 +39,11 @@ def get_param(src, key, def_value=None):
 
 
 def handle_mentions(since_id=None):
+    last_mention = MentionDao.get_last_mention()
+
+    if not since_id and last_mention:
+        since_id = last_mention.mention_id
+
     print("Checking mentions since_id: " + str(since_id))
 
     try:
@@ -64,11 +72,17 @@ def handle_mentions(since_id=None):
                         handler = TweetHandler(str(original_tweet['id']), original_tweet['text'])
 
                     try:
+                        tweet = handler.get_tweet()
+                        if tweet:
+                            TweetDao.insert(tweet)
+
                         response = handler.handle()
                         if response:
                             for msg in response:
                                 print('replying to: ' + str(m.id) + " with: " + msg)
                                 post_tweet(msg, str(m.id))
+                                resp = ResponseDao.insert(Response(text=msg))
+                                TweetResponseDao.insert(str(m.id), resp.response_id)
 
                     except Exception:
                         print(traceback.format_exc())

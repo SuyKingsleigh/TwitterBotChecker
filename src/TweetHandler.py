@@ -2,6 +2,7 @@ import re
 
 from src.FactCheckerClient import FactCheckerClient
 from src.MetaDataAnalyzer import MetaDataAnalyzer
+from src.db.Tweet import Tweet
 
 
 class TweetHandler:
@@ -15,6 +16,11 @@ class TweetHandler:
     def _get_by_id(self):
         pass
 
+    def get_tweet(self) -> Tweet:
+        return Tweet(tweet_id=self._id, text=self._text, link=self.find_links_as_string())
+
+    def find_links_as_string(self):
+        ", ".join(self.find_links())
 
     # Retornara um array contendo todos os links de um tweet
     def find_links(self):

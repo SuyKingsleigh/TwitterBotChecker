@@ -80,15 +80,18 @@ class MentionDao:
             driver.cursor.execute(insert, (mention.mention_id, mention.since_id))
 
     @staticmethod
-    def get_last_mention():
-        query = """SELECT * from Mention ORDER BY id DESC LIMIT 1 """
-        with DBDriver() as driver:
-            driver.cursor.execute(query, )
-            mention = None
-            for (id, mention_id, since_id, checked_at) in driver.cursor:
-                mention = Mention(id=id, mention_id=mention_id, since_id=since_id, checked_at=checked_at)
+    def get_last_mention() -> Mention:
+        try:
+            query = """SELECT * from Mention ORDER BY id DESC LIMIT 1 """
+            with DBDriver() as driver:
+                driver.cursor.execute(query, )
+                mention = None
+                for (id, mention_id, since_id, checked_at) in driver.cursor:
+                    mention = Mention(id=id, mention_id=mention_id, since_id=since_id, checked_at=checked_at)
 
-            return mention
+                return mention
+        except:
+            return None
 
 
 class ResponseDao:
@@ -98,30 +101,38 @@ class ResponseDao:
 
         with DBDriver(commit=True) as driver:
             driver.cursor.execute(insert, (response.text,))
+            return Response(response_id=driver.cursor.lastrowid, text=response.text)
 
     @staticmethod
-    def find_by_link(link):
-        query = """SELECT * From Response r
+    def find_by_link(link) -> Response:
+        try:
+            query = """SELECT * From Response r
                         JOIN TweetResponse TR on r.response_id = TR.response_id
                         JOIN Tweet T on TR.tweet_id = T.tweet_id
                             WHERE T.link = %s
                         """
 
-        with DBDriver() as driver:
-            driver.cursor.execute(query, (link,))
-            response = None
-            for (response_id, text) in driver.cursor:
-                response = Response(response_id=response_id, text=text)
+            with DBDriver() as driver:
+                driver.cursor.execute(query, (link,))
+                response = None
 
-            return response
+                for (response_id, text) in driver.cursor:
+                    response = Response(response_id=response_id, text=text)
+
+                return response
+        except:
+            return None
 
 
 class TweetResponseDao:
     @staticmethod
     def insert(tweet_id: str, response_id: int):
-        insert = """INSERT INTO TweetResponse (tweet_id, response_id) VALUES (%s, %s)"""
-        with DBDriver(commit=True) as driver:
-            driver.cursor.execute(insert, (tweet_id, response_id))
+        try:
+            insert = """INSERT INTO TweetResponse (tweet_id, response_id) VALUES (%s, %s)"""
+            with DBDriver(commit=True) as driver:
+                driver.cursor.execute(insert, (tweet_id, response_id))
+        except:
+            pass
 
 
 if __name__ == '__main__':
@@ -136,5 +147,5 @@ if __name__ == '__main__':
     # MentionDao.insert(mention)
     # print(MentionDao.get_last_mention().checked_at)
     #
-    # ResponseDao.insert(Response(text="uma string sei lá " + str(time.time())))
-    TweetResponseDao.insert("123abc", 1)
+    print(ResponseDao.insert(Response(text="uma string sei lá " + str(time.time()))).response_id)
+    # TweetResponseDao.insert("123abc", 1)
