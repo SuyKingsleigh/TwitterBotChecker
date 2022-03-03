@@ -67,9 +67,16 @@ def handle_mentions(since_id=None):
                     if not handler.has_links():
                         print("Could not find links, checking thread ...")
                         thread = client.get_tweet(id=str(m.id), user_auth=True, expansions=['referenced_tweets.id'])
-                        original_tweet = thread.includes['tweets'][0]['data']
+                        try:
+                            original_tweet = thread.includes['tweets'][0]['data']
+                            handler = TweetHandler(str(original_tweet['id']), original_tweet['text'])
+                        except:
+                            pass
 
-                        handler = TweetHandler(str(original_tweet['id']), original_tweet['text'])
+                        if not handler.has_links():
+                            post_tweet("Não encontrei nenhum link no seu tweet, poderia me passar a fonte para eu verificar?"
+                                       , str(m.id))
+                            continue
 
                     try:
                         tweet = handler.get_tweet()
@@ -77,6 +84,7 @@ def handle_mentions(since_id=None):
                             TweetDao.insert(tweet)
 
                         response = handler.handle()
+                        print("Response: " + str(response))
                         if response:
                             for msg in response:
                                 print('replying to: ' + str(m.id) + " with: " + msg)

@@ -73,4 +73,4 @@ class TweetHandler:
 
 if __name__ == '__main__':
     print(TweetHandler('123',
-                       'uga buga  https://www.ndtv.com/world-news/ghost-of-kyiv-real-or-urban-legend-some-facts-about-ukraines-ace-2795817').handle())
+                       'Olha que louco isso ai  https://www.ndtv.com/world-news/ghost-of-kyiv-real-or-urban-legend-some-facts-about-ukraines-ace-2795817').handle())
