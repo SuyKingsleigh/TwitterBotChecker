@@ -31,8 +31,10 @@ class FactCheckerClient:
 
     def check(self):
         url = self._build_url(pretty=True)
-        print("calling url `" + url + "`")
+
+        print("FactCheckerClient.check() => calling url `" + url + "`")
         response = requests.request("GET", url, headers={}, data={})
+
         if response.status_code == 200:
             return json.loads(response.text)
         else:

@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from src.TweetHandler import TweetHandler
 from src.db.DBDriver import MentionDao, TweetDao, ResponseDao, TweetResponseDao
 from src.db.Response import Response
-from src.db.Tweet import Tweet
 
 load_dotenv()
 
@@ -74,9 +73,14 @@ def handle_mentions(since_id=None):
                             pass
 
                         if not handler.has_links():
-                            post_tweet("Não encontrei nenhum link no seu tweet, poderia me passar a fonte para eu verificar?"
-                                       , str(m.id))
-                            continue
+                            resp = handler.handle_when_no_link()
+
+                            if resp and resp['data']:
+                                for text in resp['data']:
+                                    try:
+                                        post_tweet(text[0:280], str(m.id))
+                                    except:
+                                        pass
 
                     try:
                         tweet = handler.get_tweet()

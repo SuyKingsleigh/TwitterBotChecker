@@ -10,6 +10,18 @@ class TweetHandler:
         self._id = id
         self._text = text
 
+    def handle_when_no_link(self):
+        print('handle_when_no_link() handling tweet without link: ' + self._text)
+
+        self._text = self._text.split(" ")
+        param_list = []
+
+        for param in self._text:
+            if len(param) > 0 and param[0] != '@':
+                param_list.append(param)
+
+        return FactCheckerClient(param_list).check()
+
     def has_links(self):
         return len(self.find_links()) > 0
 
