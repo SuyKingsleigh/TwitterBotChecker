@@ -29,7 +29,11 @@ class TweetHandler:
         pass
 
     def get_tweet(self) -> Tweet:
-        return Tweet(tweet_id=self._id, text=self._text, link=self.find_links_as_string())
+        try:
+            return Tweet(tweet_id=self._id, text=self._text, link=self.find_links_as_string())
+        except Exception as e:
+            print(e)
+            return Tweet(tweet_id=self._text, text=self._text, link=self._text)
 
     def find_links_as_string(self):
         ", ".join(self.find_links())

@@ -78,9 +78,10 @@ def handle_mentions(since_id=None):
                             if resp and resp['data']:
                                 for text in resp['data']:
                                     try:
+                                        print('posting tweet: ' + text[0:280] + ' to id: ' + str(m.id))
                                         post_tweet(text[0:280], str(m.id))
-                                    except:
-                                        pass
+                                    except Exception as e:
+                                        print(e)
 
                     try:
                         tweet = handler.get_tweet()
