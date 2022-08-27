@@ -86,7 +86,10 @@ def handle_mentions(since_id=None):
                     try:
                         tweet = handler.get_tweet()
                         if tweet:
-                            TweetDao.insert(tweet)
+                            try:
+                                TweetDao.insert(tweet)
+                            except:
+                                pass
 
                         response = handler.handle()
                         print("Response: " + str(response))
